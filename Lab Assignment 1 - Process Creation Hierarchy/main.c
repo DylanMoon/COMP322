@@ -8,8 +8,6 @@
  *
  * */
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -44,7 +42,7 @@ void PrintMenu() {
     printf("Enter selection: ");
 }
 
-void *CreatePCB(int ndx) {
+PCB *CreatePCB(int ndx) {
     PCB *node = malloc(sizeof(PCB));
     node->index = ndx;
     node->Child = NULL;
@@ -52,7 +50,7 @@ void *CreatePCB(int ndx) {
     return node;
 }
 
-void *GetNodeByIndex(int ndx) {
+PCB *GetNodeByIndex(int ndx) {
     PCB *currNode = Pcb_List;
     if (ndx < 0)return NULL;
     int count = 0;
@@ -153,19 +151,19 @@ void CreateProcess() {
 
 /***************************************************************/
 /*RECURSIVE PROCEDURE TO DESTROY CHILDREN PROCESSES*/
-void deleteChildren_recursiveHelper(Node *toBeRemoved) {
+void DeleteChildren_Recurse(Node *toBeRemoved) {
     if (toBeRemoved == NULL)return;
-    if (toBeRemoved->child != NULL) deleteChildren_recursiveHelper(toBeRemoved->child);
+    if (toBeRemoved->child != NULL) DeleteChildren_Recurse(toBeRemoved->child);
     free(toBeRemoved);
 }
 
-void deleteChildren(int ndx) {
+void DeleteChildren(int ndx) {
     PCB *target = GetNodeByIndex(ndx);
     if (target == NULL) {
         printf("Index %d does not exist.", ndx);
         return;
     }
-    deleteChildren_recursiveHelper(target->Child);
+    DeleteChildren_Recurse(target->Child);
     target->Child = NULL;
     target->index = -1;
 }
@@ -173,26 +171,26 @@ void deleteChildren(int ndx) {
 
 /***************************************************************/
 /*PROCEDURE FOR OPTION #3*/
-void deleteChildrenPrompt() {
+void DeleteChildrenPrompt() {
     int index;
     printf("Enter the index of the process whose descendants are to be destroyed: ");
     scanf("%d", &index);
-    deleteChildren(index);
+    DeleteChildren(index);
 }
 
 
 /***************************************************************/
 /*PROCEDURE FOR OPTION #4*/
-void freeAllMemory() {
+void FreeAllMemory() {
     PCB *curr;
     while (Pcb_Count() > 1) {
         curr = Pcb_List;
         while (curr->Next != GetNodeByIndex(Pcb_Count() - 1))curr = curr->Next;
-        deleteChildren(Pcb_Count() - 1);
+        DeleteChildren(Pcb_Count() - 1);
         free(curr->Next);
         curr->Next = NULL;
     }
-    deleteChildren(Pcb_Count() - 1);
+    DeleteChildren(Pcb_Count() - 1);
     free(Pcb_List);
     Pcb_List = NULL;
 }
@@ -213,11 +211,11 @@ int main() {
                 PrintProcesses();
                 break;
             case 3:
-                deleteChildrenPrompt();
+                DeleteChildrenPrompt();
                 PrintProcesses();
                 break;
             case 4:
-                freeAllMemory();
+                FreeAllMemory();
                 printf("Quitting program...");
                 break;
             default:
