@@ -1,3 +1,15 @@
+/*
+ *
+ * Dylan Moon
+ * CSUN
+ * Summer 2022
+ * COMP 322 - 10543
+ * Lab Assignment 1
+ *
+ * */
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
