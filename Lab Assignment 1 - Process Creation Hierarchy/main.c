@@ -96,14 +96,8 @@ void CreatePcbList() {
         return;
     }
     int count;
-    char rawInput;
     printf("Enter maximum number of processes: ");
-    scanf("%s", &rawInput);
-    if (!isdigit(rawInput)) {
-        printf("***Invalid Input***\n");
-        return;
-    }
-    count = rawInput - '0';
+    scanf("%d", &count);
     if (count == 0)return;
     Pcb_List = CreatePCB(0);
     Pcb_List->index = 0;
@@ -121,16 +115,12 @@ void CreatePcbList() {
 /***************************************************************/
 /*PROCDURE FOR OPTION #2*/
 void CreateProcess() {
-    char rawInput;
+    int index;
     printf("Enter the parent process index: ");
-    scanf("%s", &rawInput);
-    if (!isdigit(rawInput)) {
-        printf("***Invalid Input***\n");
-        return;
-    }
-    PCB *target = GetNodeByIndex(rawInput - '0');
+    scanf("%d", &index);
+    PCB *target = GetNodeByIndex(index);
     if (target == NULL) {
-        printf("Index %d does not exist.\n", rawInput - '0');
+        printf("Index %d does not exist.\n", index);
         return;
     }
     Node *child = target->Child;
@@ -172,14 +162,10 @@ void deleteChildren(int ndx) {
 /***************************************************************/
 /*PROCEDURE FOR OPTION #3*/
 void deleteChildrenPrompt() {
-    char rawInput;
+    int index;
     printf("Enter the index of the process whose descendants are to be destroyed: ");
-    scanf("%s", &rawInput);
-    if (!isdigit(rawInput)) {
-        printf("***Invalid Input***\n");
-        return;
-    }
-    deleteChildren(rawInput - '0');
+    scanf("%d", &index);
+    deleteChildren(index);
 }
 
 
@@ -203,11 +189,9 @@ void freeAllMemory() {
 /***************************************************************/
 int main() {
     int input = 0;
-    char rawInput = 'a';
     while (input != 4) {
         PrintMenu();
-        scanf("%s", &rawInput);
-        if (isdigit(rawInput)) input = rawInput - '0';
+        scanf("%d", &input);
         switch (input) {
             case 1:
                 CreatePcbList();
