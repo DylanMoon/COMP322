@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Lab_Assignment_2___Batch_Process_Scheduling",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Lab_Assignment_2___Batch_Process_Scheduling::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Lab_Assignment_2___Batch_Process_Scheduling-Debug-f83a348089335da0afc7.json",
+					"name" : "Lab_Assignment_2___Batch_Process_Scheduling",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/Moonski/Git/COMP322/Lab Assignment 2 - Batch Process Scheduling/cmake-build-debug",
+		"source" : "/Users/Moonski/Git/COMP322/Lab Assignment 2 - Batch Process Scheduling"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}
