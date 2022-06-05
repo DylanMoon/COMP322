@@ -81,8 +81,7 @@ int ProcessToSchedule(){
 /***************************************************************/
 /*"PROCEDURE TO PRINT THE CONTENTS OF THE SCHEDULING TABLE"*/
 void PrintTable() {
-    printf("\n%-8s%-8s%-8s%-8s%-8s%-8s\n", "ID", "Arrival", "Total", "Start", "End", "Turnaround");
-    printf("--------------------------------------------------\n");
+    printf("\n%-8s%-8s%-8s%-8s%-8s%-8s\n--------------------------------------------------\n", "ID", "Arrival", "Total", "Start", "End", "Turnaround");
     for (int i = 0; i < P_Length; i++) {
         printf("%-8d%-8d%-8d", P[i].schedule->id, P[i].schedule->arrival, P[i].schedule->total_cpu);
         if(P[i].schedule->done)printf("%-8d%-8d%-8d", P[i].schedule->start_time, P[i].schedule->end_time, P[i].schedule->turnaround_time);
@@ -145,15 +144,17 @@ void method3() {
         Schedule *curr;
         for (int i = 0; i <P_Length; i++) {
             if(P[i].schedule->done)continue;
-            P[i].schedule->done = 1;
+            if(P[i].schedule->arrival <= currentCycleTime && P[i].schedule->total_cpu < lowestTotalCycleTIme){
+                curr = P[i].schedule;
+                lowestTotalCycleTIme = curr->total_cpu;
+            }
         }
+        curr->start_time = currentCycleTime;
+        curr->end_time = currentCycleTime + curr->total_cpu;
+        currentCycleTime = curr->end_time;
+        curr->turnaround_time = curr->end_time - curr->arrival;
+        curr->done = 1;
     }
-/* while there are still processes to schedule */
-/* initilize the lowest total cycle time to INT_MAX (largest integer value) */
-/* for each process not yet scheduled */
-/* check if process has lower total cycle time than current lowest and has arrival time less than current cycle time and update */
-/* set start time, end time, turnaround time, done fields for unscheduled process with lowest (and available) total cycle time */
-/* update current cycle time and increment number of processes scheduled */
 }
 
 
