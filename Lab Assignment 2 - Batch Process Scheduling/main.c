@@ -12,8 +12,6 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#define true = 1;
-#define false = 0;
 
 /* declare global variables including a table structure to hold scheduling information */
 typedef struct prc {
@@ -53,38 +51,30 @@ int P_Length;
 
 /* optional: define a function that finds the maximum of two integers */
 int GetMax(const int *num1, const int *num2) { return *num1 > *num2 ? *num1 : *num2; }
-
-int GetMax2(const int *num1, const int *num2) { return (*num1 > *num2) * *num1 + (*num2 > *num1) * *num2; }
+int GetMin(const int *num1, const int *num2) { return *num1 < *num2 ? *num1 : *num2; }
 
 
 /***************************************************************/
 /* Helpers */
 
-void SetProcessId(Schedule *const ptr, int _id) { ptr->id = _id; }
-
-void SetProcessArrivalTime(Schedule *const ptr, int _id) { ptr->arrival = _id; }
-
-void SetProcessTotalCycleTime(Schedule *const ptr, int _id) { ptr->total_cpu = _id; }
-
-int GetProcessDone(const Schedule *ptr) { return ptr->done; }
-
-void SetProcessDone(Schedule *ptr, int val) { ptr->done = val; }
-
-int GetProcessStarted(const Schedule *ptr) { return ptr->already_started; }
-
-void SetProcessStarted(Schedule *ptr, int val) { ptr->already_started = val; }
-
-Schedule *GetSchedule(int ndx){return P[ndx].schedule;}
-
 void PrintMenu() {
-    printf("\nBatch scheduling\n");
-    printf("----------------\n");
-    printf("1) Enter parameters\n");
-    printf("2) Schedule processes with FIFO algorithm\n");
-    printf("3) Schedule processes with SJF algorithm\n");
-    printf("4) Schedule processes with SRT algorithm\n");
-    printf("5) Quit and free memory\n\n");
-    printf("Enter selection: ");
+    printf("\nBatch scheduling\n----------------\n1) Enter parameters\n2) Schedule processes with FIFO algorithm\n3) Schedule processes with SJF algorithm\n4) Schedule processes with SRT algorithm\n5) Quit and free memory\n\nEnter selection: ");
+}
+void ResetDone(){
+    for (int i = 0; i < P_Length; i++) {
+        P[i].schedule->done = 0;
+        P[i].schedule->already_started = 0;
+        P[i].schedule->start_time = 0;
+        P[i].schedule->end_time = 0;
+        P[i].schedule->turnaround_time = 0;
+    }}
+void FreeAllMemory();
+int ProcessToSchedule(){
+    for (int i = 0; i < P_Length; i++) {
+        if(P[i].schedule->done)continue;
+        return 1;
+    }
+    return 0;
 }
 
 
@@ -94,27 +84,17 @@ void PrintTable() {
     printf("\n%-8s%-8s%-8s%-8s%-8s%-8s\n", "ID", "Arrival", "Total", "Start", "End", "Turnaround");
     printf("--------------------------------------------------\n");
     for (int i = 0; i < P_Length; i++) {
-        GetProcessDone(P[i].schedule) ?
-        printf("%-8d%-8d%-8d%-8d%-8d%-8d\n", P[i].schedule->id, P[i].schedule->arrival, P[i].schedule->total_cpu, P[i].schedule->start_time, P[i].schedule->end_time, P[i].schedule->turnaround_time):
-        printf("%-8d%-8d%-8d\n", P[i].schedule->id, P[i].schedule->arrival, P[i].schedule->total_cpu);
+        printf("%-8d%-8d%-8d", P[i].schedule->id, P[i].schedule->arrival, P[i].schedule->total_cpu);
+        if(P[i].schedule->done)printf("%-8d%-8d%-8d", P[i].schedule->start_time, P[i].schedule->end_time, P[i].schedule->turnaround_time);
+        printf("\n");
     }
-/* declare local variables */
-/* print table header */
-/* for each process */
-/* print the contents (id, arrival time, total_cycles) of each field of the table's index */
-/* if process has been scheduled ("done" field is 1, print other contents (start time, end time, turnaround time) */
-    return;
 }
 
 
 /***************************************************************/
 /*"PROCEDURE FOR OPTION #1"*/
 void Method1() {
-/* declare local variables */
-    if (P != NULL) {
-        printf("Table already exists.....\nExiting method call\n");
-        return;
-    }
+    if (P != NULL)FreeAllMemory();
     printf("Enter total number of processes: ");
     scanf("%d", &P_Length);
     if (P_Length == 0)return;
@@ -128,45 +108,52 @@ void Method1() {
         printf("Enter total cycles for process P[%d]: ", i+1);
         scanf("%d", &P[i].schedule->total_cpu);
     }
-    PrintTable();
-    /* prompt for total number of processes */
-/* allocate memory for table to hold process parameters */
-/* for each process */
-/* prompt for process id, arrival time, and total cycle time */
-/* print contents of table */
-    return;
 }
 
 
 /***************************************************************/
 /*"PROCEDURE FOR OPTION #2"*/
 void method2() {
-/* declare (and initilize when appropriate) local variables */
-/* for each process, reset "done" field to 0 */
-/* while there are still processes to schedule */
-/* initilize the earliest arrival time to INT_MAX (largest integer value) */
-/* for each process not yet scheduled */
-/* check if process has earlier arrival time than current earliest and update */
-/* set start time, end time, turnaround time, done fields for unscheduled process with earliest arrival time */
-/* update current cycle time and increment number of processes scheduled */
-/* print contents of table */
-    return;
+    ResetDone();
+    int startTime = 0;
+    while (ProcessToSchedule()){
+        int earliestArrival = INT_MAX;
+        Schedule *curr;
+        for (int i = 0; i < P_Length; i++) {
+            if(P[i].schedule->done)continue;
+            if(P[i].schedule->arrival < earliestArrival){
+                earliestArrival = P[i].schedule->arrival;
+                curr = P[i].schedule;
+            }
+        }
+        curr->start_time = startTime;
+        curr->end_time = startTime + curr->total_cpu;
+        startTime = curr->end_time;
+        curr->turnaround_time = curr->end_time - curr->arrival;
+        curr->done = 1;
+    }
 }
 
 
 /***************************************************************/
 /*"PROCEDURE FOR OPTION #3"*/
 void method3() {
-/* declare (and initilize when appropriate) local variables */
-/* for each process, reset "done" field to 0 */
+    ResetDone();
+    int currentCycleTime = 0;
+    while(ProcessToSchedule()){
+        int lowestTotalCycleTIme= INT_MAX, lowestStartTime = INT_MAX;
+        Schedule *curr;
+        for (int i = 0; i <P_Length; i++) {
+            if(P[i].schedule->done)continue;
+            P[i].schedule->done = 1;
+        }
+    }
 /* while there are still processes to schedule */
 /* initilize the lowest total cycle time to INT_MAX (largest integer value) */
 /* for each process not yet scheduled */
 /* check if process has lower total cycle time than current lowest and has arrival time less than current cycle time and update */
 /* set start time, end time, turnaround time, done fields for unscheduled process with lowest (and available) total cycle time */
 /* update current cycle time and increment number of processes scheduled */
-/* print contents of table */
-    return;
 }
 
 
@@ -175,6 +162,7 @@ void method3() {
 void method4() {
 /* declare (and initilize when appropriate) local variables */
 /* for each process, reset "done", "total_remaining" and "already_started" fields to 0 */
+ResetDone();
 /* while there are still processes to schedule */
 /* initilize the lowest total remaining time to INT_MAX (largest integer value) */
 /* for each process not yet scheduled */
@@ -184,34 +172,44 @@ void method4() {
 /* set end time, turnaround time of process with lowest (and available) total remaining cycle time */
 /* decrement total remaining time of process with lowest (and available) total remaining cycle time */
 /* if remaining time is 0, set done field to 1, increment cycle time and number of scheduled processes*/
-/* print contents of table */
-    return;
 }
 
 
 /***************************************************************/
 /*"PROCEDURE FOR OPTION #5"*/
 void FreeAllMemory() {
-/* free the schedule table if not NULL */
-    return;
+    if(P == NULL)return;
+    for (int i = 0; i < P_Length; i++) {
+        free(P[i].schedule);
+        P[i].schedule = NULL;
+    }
+    free(P);
+    P = NULL;
 }
 
 
 /***************************************************************/
 int main() {
     int input = 0;
-    while (input != 4) {
+    do {
         PrintMenu();
         scanf("%d", &input);
         switch (input) {
             case 1:
                 Method1();
+                PrintTable();
                 break;
             case 2:
+                method2();
+                PrintTable();
                 break;
             case 3:
+                method3();
+                PrintTable();
                 break;
             case 4:
+                method4();
+                PrintTable();
                 break;
             case 5:
                 FreeAllMemory();
@@ -221,15 +219,6 @@ int main() {
                 printf("*** Invalid input ***\n");
                 break;
         }
-
-    }
+    } while (input != 5);
     return 1;
-    /* declare local vars */
-    /* while user has not chosen to quit */
-    /* print menu of options */
-    /* prompt for menu selection */
-    /* call appropriate procedure based on choice--use switch statement or series of if, else if, else statements */
-} /* while loop */
-/* indicates success */
-/* end of procedure */
-
+}
