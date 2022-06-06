@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
+#include <limits.h>
 
 /* Define structures and global variables*/
 typedef struct process_node {
@@ -27,6 +27,7 @@ typedef struct pcb_Node {
 PCB *Pcb_List = NULL;
 
 int nextProcess = 1;
+//TODO: get rid of global, so indices can be reused
 
 
 /***************************************************************/
@@ -40,6 +41,13 @@ void PrintMenu() {
     printf("3) Destroy all descendants of a process\n");
     printf("4) Quit program and free memory\n\n");
     printf("Enter selection: ");
+}
+
+Node *CreateNode(int ndx){
+    Node *node = malloc(sizeof(Node));
+    node->process = ndx;
+    node->child = NULL;
+    return node;
 }
 
 PCB *CreatePCB(int ndx) {
@@ -76,6 +84,12 @@ int Process_Count() {
     return nextProcess-1;
 }
 
+int GetNextNodeIndex(){
+    PCB *head = Pcb_List;
+    if(head == NULL)return -1;
+    int nextLowest = INT_MIN;
+    return 0;//TODO: make this work
+}
 
 /***************************************************************/
 /*PROCEDURE TO PRINT HIERARCHY OF PROCESSES*/
@@ -135,16 +149,14 @@ void CreateProcess() {
     }
     Node *child = target->Child;
     if (child == NULL) {
-        target->Child = malloc(sizeof(Node));
-        target->Child->process = nextProcess;
+        target->Child = CreateNode(nextProcess);
         nextProcess++;
         return;
     }
     while (child->child != NULL) {
         child = child->child;
     }
-    child->child = malloc(sizeof(Node));
-    child->child->process = nextProcess;
+    child->child = CreateNode(nextProcess);
     nextProcess++;
 }
 
@@ -165,7 +177,8 @@ void DeleteChildren(int ndx) {
     }
     DeleteChildren_Recurse(target->Child);
     target->Child = NULL;
-    target->index = -1;
+//    target->index = -1;
+    //TODO: reset index upon call again
 }
 
 
