@@ -130,6 +130,7 @@ void EnterParams() {
 
 /***************************************************************/
 /*"PROCEDURE FOR OPTION #2"*/
+/*First come, first served*/
 void ScheduleFIFO() {
     ResetSchedules();
     int currCycleTime = 0;
@@ -150,6 +151,7 @@ void ScheduleFIFO() {
 
 /***************************************************************/
 /*"PROCEDURE FOR OPTION #3"*/
+/*Shortest Job First*/
 void ScheduleSJF() {
     ResetSchedules();
     int currCycleTime = 0;
@@ -170,6 +172,7 @@ void ScheduleSJF() {
 
 /***************************************************************/
 /*"PROCEDURE FOR OPTION #4"*/
+/*Shortest Remaining Time*/
 void ScheduleSRT() {
     ResetSchedules();
     while (ProcessToSchedule()){

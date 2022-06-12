@@ -10,25 +10,23 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 
 /* Define structures and global variables*/
-typedef struct process_node {
+typedef struct node1 linkedList;
+typedef struct node2 PcbNode;
+
+struct node1 {
     int process;
-    struct process_node *child;
-} Node;
+    linkedList *link;
+};
 
-typedef struct pcb_Node {
-    int index;
-    Node *Child;
-    struct pcb_Node *Next;
-} PCB;
+struct node2 {
+    int parent;
+    linkedList *children;
+};
 
-PCB *Pcb_List = NULL;
-
-int nextProcess = 1;
-//TODO: get rid of global, so indices can be reused
-
+PcbNode *PCB;
+int count;
 
 /***************************************************************/
 /* Helpers */
@@ -43,144 +41,92 @@ void PrintMenu() {
     printf("Enter selection: ");
 }
 
-Node *CreateNode(int ndx){
-    Node *node = malloc(sizeof(Node));
-    node->process = ndx;
-    node->child = NULL;
-    return node;
+void InitializePCB(PcbNode *node) {
+    node->parent = -1;
+    node->children = NULL;
 }
 
-PCB *CreatePCB(int ndx) {
-    PCB *node = malloc(sizeof(PCB));
-    node->index = ndx;
-    node->Child = NULL;
-    node->Next = NULL;
-    return node;
-}
-
-PCB *GetNodeByIndex(int ndx) {
-    PCB *currNode = Pcb_List;
-    if (ndx < 0)return NULL;
-    int count = 0;
-    while (count < ndx) {
-        if (currNode->Next == NULL)return NULL;
-        currNode = currNode->Next;
-        count++;
+void Append(linkedList *list, linkedList *newNode){
+    linkedList *curr = list;
+    while(curr ->link != NULL){
+        curr = curr->link;
     }
-    return currNode;
+    curr->link = newNode;
 }
 
-int Pcb_Count() {
-    PCB *currNode = Pcb_List;
-    int count = 0;
-    while (currNode != NULL) {
-        currNode = currNode->Next;
-        count++;
+int GetNextWithoutParent(){
+    for (int i = 0; i < count; i++) {
+        if(PCB[i].parent == -1) {return i;}
     }
-    return count;
-}
-
-int Process_Count() {
-    return nextProcess-1;
-}
-
-int GetNextNodeIndex(){
-    PCB *head = Pcb_List;
-    if(head == NULL)return -1;
-    int nextLowest = INT_MIN;
-    return 0;//TODO: make this work
+    return -1;
 }
 
 /***************************************************************/
 /*PROCEDURE TO PRINT HIERARCHY OF PROCESSES*/
 void PrintProcesses() {
-    PCB *currNode = Pcb_List;
-    while (currNode != NULL) {
-        Node *currChild = currNode->Child;
-        if (currChild == NULL) {
-            currNode = currNode->Next;
-            continue;
+    for (int i = 0; i < count; i++) {
+        if ((PCB[i].parent != -1) && (PCB[i].children != NULL)) {
+            printf("PCB[%d] is the parent of", i);
+            linkedList *next = PCB[i].children;
+            while (next != NULL) {
+                printf(" PCB[%d]", next->process);
+                next = next->link;
+            }
+            printf("\n");
         }
-        printf("PCB[%d] is the parent of:", currNode->index);
-        while (currChild != NULL) {
-            printf(" PCB[%d]", currChild->process);
-            currChild = currChild->child;
-        }
-        printf("\n");
-        currNode = currNode->Next;
     }
 }
-
 
 /***************************************************************/
 /*PROCEDURE FOR OPTION #1*/
 void CreatePcbList() {
-    if (Pcb_List != NULL) {
-        printf("List already exists..... Exiting method call\n");
-        return;
-    }
-    int count;
     printf("Enter maximum number of processes: ");
     scanf("%d", &count);
     if (count == 0)return;
-    Pcb_List = CreatePCB(0);
-    Pcb_List->index = 0;
-    PCB *currNode = Pcb_List;
-    int currNdx = 1;
-    while (currNdx < count) {
-        currNode->Next = CreatePCB(currNdx);
-        currNode = currNode->Next;
-        currNode->index = currNdx;
-        currNdx++;
+    PCB = (PcbNode *) malloc(count * sizeof(PcbNode));
+    for (int i = 0; i < count; i++) {
+        InitializePCB(&PCB[i]);
     }
+    PCB[0].parent=0;
 }
 
 
 /***************************************************************/
 /*PROCDURE FOR OPTION #2*/
 void CreateProcess() {
-    int index;
-    printf("Enter the parent process index: ");
-    scanf("%d", &index);
-    PCB *target = GetNodeByIndex(index);
-    if (target == NULL) {
-        printf("Index %d does not exist.\n", index);
-        return;
+    //TODO: this is not working
+    int p;
+    printf("Enter the parent process p: ");
+    scanf("%d", &p);
+    PcbNode *target = &PCB[p];
+    int q = GetNextWithoutParent();
+    PCB[q].parent = p;
+    linkedList *newChild = malloc(sizeof(linkedList));
+    newChild->link = NULL;
+    newChild->process = q;
+    linkedList *curr = target->children;
+    if(curr == NULL){
+        target->children = newChild;
     }
-    Node *child = target->Child;
-    if (child == NULL) {
-        target->Child = CreateNode(nextProcess);
-        nextProcess++;
-        return;
+    else
+    {
+        Append(curr, newChild);
     }
-    while (child->child != NULL) {
-        child = child->child;
-    }
-    child->child = CreateNode(nextProcess);
-    nextProcess++;
 }
-
 
 /***************************************************************/
 /*RECURSIVE PROCEDURE TO DESTROY CHILDREN PROCESSES*/
-void DeleteChildren_Recurse(Node *toBeRemoved) {
-    if (toBeRemoved == NULL)return;
-    if (toBeRemoved->child != NULL) DeleteChildren_Recurse(toBeRemoved->child);
-    free(toBeRemoved);
-}
 
-void DeleteChildren(int ndx) {
-    PCB *target = GetNodeByIndex(ndx);
-    if (target == NULL) {
-        printf("Index %d does not exist.", ndx);
-        return;
-    }
-    DeleteChildren_Recurse(target->Child);
-    target->Child = NULL;
-//    target->index = -1;
-    //TODO: reset index upon call again
+void DeleteChildRecurse(linkedList *node) {
+    //TODO: this is horrible sig fault right now
+    if (node == NULL)return;
+    DeleteChildRecurse(node->link);
+    int q = node->process;
+    DeleteChildRecurse(PCB[q].children);
+    free(node);
+    PCB[q].parent = -1;
+    PCB[q].children = NULL;
 }
-
 
 /***************************************************************/
 /*PROCEDURE FOR OPTION #3*/
@@ -188,29 +134,22 @@ void DeleteChildrenPrompt() {
     int index;
     printf("Enter the index of the process whose descendants are to be destroyed: ");
     scanf("%d", &index);
-    DeleteChildren(index);
+    DeleteChildRecurse(PCB[index].children);
+    PCB[index].children = NULL;
 }
 
 
 /***************************************************************/
 /*PROCEDURE FOR OPTION #4*/
 void FreeAllMemory() {
-    PCB *curr;
-    while (Pcb_Count() > 1) {
-        curr = Pcb_List;
-        while (curr->Next != GetNodeByIndex(Pcb_Count() - 1))curr = curr->Next;
-        DeleteChildren(Pcb_Count() - 1);
-        free(curr->Next);
-        curr->Next = NULL;
-    }
-    DeleteChildren(Pcb_Count() - 1);
-    free(Pcb_List);
-    Pcb_List = NULL;
+    if(PCB == NULL)return;
+
 }
 
 
 /***************************************************************/
 int main() {
+    count = 0;
     int input = 0;
     while (input != 4) {
         PrintMenu();
