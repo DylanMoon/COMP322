@@ -48,65 +48,79 @@ do not have access to your computer.  I will be using the following free online 
 make sure your code compiles with the following online C compiler before submitting:
 https://www.onlinegdb.com/online_c_compiler
 Sample output
+
 Process creation and destruction
 --------------------------------
 1) Enter parameters
 2) Create a new child process
 3) Destroy all descendants of a process
 4) Quit program and free memory
+
 Enter selection: 1
 Enter maximum number of processes: 5
+
 Process creation and destruction
 --------------------------------
 1) Enter parameters
 2) Create a new child process
 3) Destroy all descendants of a process
 4) Quit program and free memory
+
 Enter selection: 2
 Enter the parent process index: 0
 PCB[0] is the parent of: PCB[1]
+
 Process creation and destruction
 --------------------------------
 1) Enter parameters
 2) Create a new child process
 3) Destroy all descendants of a process
 4) Quit program and free memory
+
 Enter selection: 2
 Enter the parent process index: 0
 PCB[0] is the parent of: PCB[1]  PCB[2]
+
 Process creation and destruction
 --------------------------------
 1) Enter parameters
 2) Create a new child process
 3) Destroy all descendants of a process
 4) Quit program and free memory
+
 Enter selection: 2
 Enter the parent process index: 2
 PCB[0] is the parent of: PCB[1]  PCB[2]
 PCB[2] is the parent of: PCB[3]
+
 Process creation and destruction
 --------------------------------
 1) Enter parameters
 2) Create a new child process
 3) Destroy all descendants of a process
 4) Quit program and free memory
+
 Enter selection: 2
 Enter the parent process index: 0
 PCB[0] is the parent of: PCB[1]  PCB[2]  PCB[4]
 PCB[2] is the parent of: PCB[3]
+
 Process creation and destruction
 --------------------------------
 1) Enter parameters
 2) Create a new child process
 3) Destroy all descendants of a process
 4) Quit program and free memory
+
 Enter selection: 3
 Enter the index of the process whose descendants are to be destroyed: 0
+
 Process creation and destruction
 --------------------------------
 1) Enter parameters
 2) Create a new child process
 3) Destroy all descendants of a process
 4) Quit program and free memory
+
 Enter selection: 4
 Quitting program...
