@@ -22,7 +22,7 @@ struct node1 {
 
 struct node2 {
     int parent;
-    uint8_t isParent;
+    int isParent;
     linkedList *children;
 };
 
@@ -67,9 +67,7 @@ void Append(PcbNode *parent, linkedList *newNode) {
     curr->link = newNode;
 }
 
-
-
-int GetNextWithoutParent(){
+int GetNextProcessWithoutParent(){
     for (int i = 0; i < count; i++) {
         if(!PCB[i].isParent && PCB[i].parent == -1) {return i;}
     }
@@ -112,7 +110,7 @@ void CreateProcess() {
     printf("Enter the parent process index: ");
     scanf("%d", &parent);
     PCB[parent].isParent = 1;
-    int process = GetNextWithoutParent();
+    int process = GetNextProcessWithoutParent();
     Append(&PCB[parent], CreateLink(process));
     PCB[process].parent = parent;
 }
@@ -151,6 +149,7 @@ void FreeAllMemory() {
         DeleteChildRecurse(PCB[i].children);
     }
     free(PCB);
+    PCB = NULL;
 }
 
 
@@ -181,7 +180,6 @@ int main() {
                 printf("*** Invalid input ***\n");
                 break;
         }
-
     }
     return 1;
 }

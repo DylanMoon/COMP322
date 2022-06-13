@@ -50,9 +50,9 @@ Table *P;
 int P_Length;
 
 /* optional: define a function that finds the maximum of two integers */
-int GetMax(const int *num1, const int *num2) { return *num1 > *num2 ? *num1 : *num2; }
+int GetMax(const int *num1, const int *num2) { return (*num1 > *num2)* *num1 + (*num2 > *num1)* *num2; }
 
-int GetMin(const int *num1, const int *num2) { return *num1 < *num2 ? *num1 : *num2; }
+int GetMin(const int *num1, const int *num2) { return (*num1 < *num2)* *num1 + (*num2 < *num1)* *num2; }
 
 
 /***************************************************************/
@@ -175,6 +175,7 @@ void ScheduleSJF() {
 /*Shortest Remaining Time*/
 void ScheduleSRT() {
     ResetSchedules();
+    return;
     while (ProcessToSchedule()){
         /* initilize the lowest total remaining time to INT_MAX (largest integer value) */
         /* for each process not yet scheduled */
