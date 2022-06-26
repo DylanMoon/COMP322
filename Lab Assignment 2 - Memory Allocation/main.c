@@ -47,8 +47,8 @@ Block *InitializeBlock(int id, int start, int end) {
 }
 
 void FreeBlock(Block *node) {
-    if (node->next)node->next->previous = node->previous;
-    if (node->previous)node->previous->next = node->next;
+    if (node->next) node->next->previous = node->previous;
+    if (node->previous) node->previous->next = node->next;
     else {
         list = node->next;
     }
@@ -73,39 +73,52 @@ void PrintTable() {
     }
 }
 
+int InsertNode(Block *node, Block *newNode) {
+    if (!node || !newNode)return 0;
+    if (node->next) {
+        node->next->previous = newNode;
+        newNode->next = node->next;
+    }
+    node->next = newNode;
+    newNode->previous = node;
+    return 1;
+}
+
 int FirstFit(const int *id, const int *size) {
     Block *curr = list;
     while (curr) {
-        if (curr->next && *size < curr->next->startAddress - curr->endAddress) {//mid list
-            Block *newNode = InitializeBlock(*id, curr->endAddress, curr->endAddress + *size);
-            newNode->previous = curr;
-            curr->next->previous = newNode;
-            newNode->next = curr->next;
-            curr->next = newNode;
-            return 1;
+        if (curr->next && *size <= curr->next->startAddress - curr->endAddress) {//mid list
+            return InsertNode(curr, InitializeBlock(*id, curr->endAddress, curr->endAddress + *size));
         }
-        if (!curr->next && *size < pm_size - curr->endAddress) {//tail of list
-            Block *newNode = InitializeBlock(*id, curr->endAddress, curr->endAddress + *size);
-            curr->next = newNode;
-            newNode->previous = curr;
-            return 1;
+        if (!curr->next && *size <= pm_size - curr->endAddress) {//tail of list
+            return InsertNode(curr, InitializeBlock(*id, curr->endAddress, curr->endAddress + *size));
         }
         curr = curr->next;
     }
     return 0;
 }
 
-int BestFit(int id, int size) {
-// best-fit algorithm
-// if hole is smaller than best so far
-// set values of best start & best end & best hole size so far
-// update best block & advance next block
-// set start & end fields of new block & add block into linked list
-// reduce remaining available memory and return
+int BestFit(const int *id, const int *size) {
+    int smallestHole = pm_size;
     Block *curr = list;
+    Block *bestFit = NULL;
     while (curr) {
-
+        if (curr->next) {//mid list
+            int holeSize = curr->next->startAddress - curr->endAddress;
+            if (holeSize && holeSize >= *size && holeSize < smallestHole) {
+                smallestHole = holeSize;
+                bestFit = curr;
+            }
+        } else { //end of list
+            int holeSize = pm_size - curr->endAddress;
+            if (holeSize && holeSize >= *size && holeSize < smallestHole) {
+                bestFit = curr;
+            }
+        }
         curr = curr->next;
+    }
+    if (bestFit) {
+        return InsertNode(bestFit, InitializeBlock(*id, bestFit->endAddress, bestFit->endAddress + *size));
     }
     return 0;
 }
@@ -118,11 +131,8 @@ void EnterParams() {
     scanf("%d", &pm_size);
     printf("Enter hole-fitting algorithm (0=first fit, 1=best_fit): ");
     scanf("%d", &a_type);
-    list = InitializeBlock(-1, 0, 0);
 }
 
-/********************************************************************/
-/*"OPTION #2"*/
 void AllocBlock() {
     int id;
     printf("Enter block id: ");
@@ -130,18 +140,21 @@ void AllocBlock() {
     int size;
     printf("Enter block size: ");
     scanf("%d", &size);
+    if (!list) {
+        if(pm_size < size){
+            printf("Error, %d units of memory not found.\n", size);
+        }
+        else{
+            list = InitializeBlock(id, 0, size);
+        }
+        return;
+    }
     if (IdExists(&id)) {
         printf("Error, id already exists.\n");
         return;
     }
-    if (list->endAddress - list->startAddress == 0) {
-        //the only node that exists is the dummy block
-        FreeBlock(list);
-        list = InitializeBlock(id, 0, size);
-        return;
-    }
-    if (a_type ? BestFit(id, size) : FirstFit(&id, &size))return;
-    printf("Error, could not find %d units of space.\n", size);
+    if (a_type ? BestFit(&id, &size) : FirstFit(&id, &size))return;
+    printf("Error, %d units of memory not found.\n", size);
 }
 
 void DeallocBlock() {

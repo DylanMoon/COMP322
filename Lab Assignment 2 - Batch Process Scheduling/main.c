@@ -50,9 +50,9 @@ Table *P;
 int P_Length;
 
 /* optional: define a function that finds the maximum of two integers */
-int GetMax(const int *num1, const int *num2) { return (*num1 > *num2)* *num1 + (*num2 > *num1)* *num2; }
+int GetMax(const int *num1, const int *num2) { return (*num1 >= *num2)* *num1 + (*num2 > *num1)* *num2; }
 
-int GetMin(const int *num1, const int *num2) { return (*num1 < *num2)* *num1 + (*num2 < *num1)* *num2; }
+int GetMin(const int *num1, const int *num2) { return (*num1 <= *num2)* *num1 + (*num2 < *num1)* *num2; }
 
 
 /***************************************************************/
